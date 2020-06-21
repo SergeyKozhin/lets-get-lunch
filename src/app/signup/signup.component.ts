@@ -27,9 +27,9 @@ export class SignupComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  signup(credentials) {
-    credentials.dietPreferences = this.getSelectedPreferences();
-    this.authService.signup(credentials).subscribe(res => {
+  signup() {
+    const dietPreferences = this.getSelectedPreferences();
+    this.authService.signup({ ...this.user, dietPreferences }).subscribe(res => {
       console.log(res);
     }, err => {
       this.errorMessage = err.error.message;
