@@ -6,6 +6,7 @@ import { AuthService } from '../services/auth/auth.service';
 import { DebugElement } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 class SignupPage {
   submitBtn: DebugElement;
@@ -29,6 +30,10 @@ class SignupPage {
   }
 }
 
+class MockRouter {
+  navigate(_) { }
+}
+
 class MockAuthService {
   signup(_) { }
 }
@@ -37,6 +42,7 @@ let component: SignupComponent;
 let fixture: ComponentFixture<SignupComponent>;
 let signupPage: SignupPage;
 let authService: AuthService;
+let router: Router;
 
 describe('SignupComponent', () => {
 
@@ -47,7 +53,8 @@ describe('SignupComponent', () => {
       .overrideComponent(SignupComponent, {
         set: {
           providers: [
-            { provide: AuthService, useClass: MockAuthService }
+            { provide: AuthService, useClass: MockAuthService },
+            { provide: Router, useClass: MockRouter }
           ]
         }
       }).compileComponents();
@@ -59,6 +66,7 @@ describe('SignupComponent', () => {
 
     signupPage = new SignupPage();
     authService = fixture.debugElement.injector.get(AuthService);
+    router = fixture.debugElement.injector.get(Router);
 
     fixture.detectChanges();
     return fixture.whenStable().then(() => {
@@ -82,6 +90,7 @@ describe('SignupComponent', () => {
     spyOn(authService, 'signup').and.callFake(() => {
       return of({ token: 'secret' });
     });
+    spyOn(router, 'navigate').and.callFake(() => Promise.resolve(true));
     signupPage.submitBtn.nativeElement.click();
 
     expect(authService.signup).toHaveBeenCalledWith({
@@ -89,6 +98,7 @@ describe('SignupComponent', () => {
       password: 'password',
       dietPreferences: ['BBQ', 'Burger']
     });
+    expect(router.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
 
   it('should display an error message with invalid credentials', () => {
