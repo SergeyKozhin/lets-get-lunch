@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -20,7 +21,7 @@ describe('AuthService', () => {
   });
 
   describe('signup', () => {
-    it('should return user object with a valid username and password', () => {
+    it('should return a token with a valid username and password', () => {
       const user = { username: 'myUser', password: 'password' };
       const signupResponse = {
         __v: 0,
@@ -29,12 +30,15 @@ describe('AuthService', () => {
         _id: '5eef96b30714f02fe5be23d5',
         dietPreferences: []
       };
+      const loginResponse = { token: 'secret' };
       let response;
 
       authService.signup(user).subscribe(res => response = res);
+      spyOn(authService, 'login').and.callFake(() => of(loginResponse));
 
       http.expectOne('http://localhost:8080/api/users').flush(signupResponse);
-      expect(response).toEqual(signupResponse);
+      expect(response).toEqual(loginResponse);
+      expect(authService.login).toHaveBeenCalled();
       http.verify();
     });
   });
@@ -52,6 +56,23 @@ describe('AuthService', () => {
       .flush({ message: signupResponse }, { status: 400, statusText: 'Bad request' });
     expect(errorResponse.error.message).toEqual(signupResponse);
     http.verify();
+  });
+
+  describe('login', () => {
+    it('should return a token with a valid username and password', () => {
+      const user = { username: 'myUSer', password: 'password' };
+      const loginResponse = { token: 'secret' };
+      let response;
+
+      authService.login(user).subscribe(res => {
+        response = res;
+      });
+
+      http.expectOne('http://localhost:8080/api/sessions').flush(loginResponse);
+      expect(response).toEqual(loginResponse);
+      expect(localStorage.getItem('Authorization')).toEqual(loginResponse.token);
+      http.verify();
+    });
   });
 
 });
