@@ -59,8 +59,8 @@ describe('NavbarComponent', () => {
     });
 
     it('should have a link to dashboard when clicking the brand name', () => {
-      const liink = fixture.debugElement.query(By.css('.navbar-brand'));
-      expect(liink.attributes.routerLink).toEqual('/dashboard');
+      const link = fixture.debugElement.query(By.css('.navbar-brand'));
+      expect(link.attributes.routerLink).toEqual('/dashboard');
     });
 
     it('should have a link to logout visible', () => {
@@ -94,6 +94,11 @@ describe('NavbarComponent', () => {
     it('should have a link to signup visible', () => {
       const link = fixture.debugElement.query(By.css('[data-test=signup]'));
       expect(link.nativeElement.innerText).toEqual('Signup');
+    });
+
+    it('should have a link to login visible', () => {
+      const link = fixture.debugElement.query(By.css('[data-test=login]'));
+      expect(link.nativeElement.innerText).toEqual('Login');
     });
   });
 });

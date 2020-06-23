@@ -14,6 +14,12 @@ describe('Navbar', () => {
         .url().should('include', '/signup');
     });
 
+    it('should show a link to login', () => {
+      cy
+        .get('[data-test=login]').click()
+        .url().should('include', '/login');
+    });
+
     it('should redirect to the base url when the navbar brand is clicked', () => {
       cy
         .get('.navbar-brand').click()
